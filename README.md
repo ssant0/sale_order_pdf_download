@@ -1,112 +1,114 @@
-# 📄 PDF en Órdenes de Venta
+# 📄 PDF on Sales Orders
 
-Descarga el PDF de una orden de venta desde el menú del engranaje, sin pasar por la impresión directa.
+**English** · [Español](README.es.md)
+
+Download a sales order PDF from the cog menu, without going through direct printing.
 
 [![Odoo 19](https://img.shields.io/badge/Odoo-19.0-714B67?logo=odoo&logoColor=white)](https://www.odoo.com/)
 [![GitHub](https://img.shields.io/badge/GitHub-ssant0%2Fsale__order__pdf__download-181717?logo=github)](https://github.com/ssant0/sale_order_pdf_download)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Versión](https://img.shields.io/badge/versi%C3%B3n-19.0.1.0.4-blue)](__manifest__.py)
-[![Licencia LGPL-3](https://img.shields.io/badge/licencia-LGPL--3-blue)](LICENSE)
-[![CI: manual](https://img.shields.io/badge/CI-manual-lightgrey)](#comandos-disponibles)
+[![Version](https://img.shields.io/badge/version-19.0.1.0.5-blue)](__manifest__.py)
+[![LGPL-3 License](https://img.shields.io/badge/license-LGPL--3-blue)](LICENSE)
+[![CI: manual](https://img.shields.io/badge/CI-manual-lightgrey)](#available-commands)
 
-## Descripción
+## Description
 
-`PDF en Órdenes de Venta` es un addon de Odoo 19 que agrega la acción **Descargar PDF** al menú de acciones (engranaje) del pedido de venta. Resuelve el caso en que `wk_odoo_direct_print` (PrintDirect) envía el documento a la impresora y no siempre permite obtener el archivo: esta acción descarga el PDF estándar `sale.report_saleorder` directamente. Está pensado para equipos de ventas y administración que necesitan el documento digital sin alterar la configuración de impresión.
+`PDF en Órdenes de Venta` is an Odoo 19 addon that adds a **Download PDF** action to the sales order action menu (cog). It solves the case where `wk_odoo_direct_print` (PrintDirect) sends the document to the printer and does not always let you obtain the file: this action downloads the standard `sale.report_saleorder` PDF directly. It is aimed at sales and administration teams that need the digital document without changing their printing setup.
 
-## Tabla de contenidos
+## Table of contents
 
-- [Descripción](#descripción)
-- [Stack técnico](#stack-técnico)
-- [Requisitos previos](#requisitos-previos)
-- [Instalación](#instalación)
-- [Variables de entorno](#variables-de-entorno)
-- [Uso](#uso)
-- [Cómo funciona](#cómo-funciona)
-- [Comandos disponibles](#comandos-disponibles)
-- [Solución de problemas](#solución-de-problemas)
-- [Limitaciones](#limitaciones)
-- [Contribuir](#contribuir)
-- [Licencia](#licencia)
-- [Historial de versiones](#historial-de-versiones)
+- [Description](#description)
+- [Tech stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Environment variables](#environment-variables)
+- [Usage](#usage)
+- [How it works](#how-it-works)
+- [Available commands](#available-commands)
+- [Troubleshooting](#troubleshooting)
+- [Limitations](#limitations)
+- [Contributing](#contributing)
+- [License](#license)
+- [Version history](#version-history)
 
-## Stack técnico
+## Tech stack
 
-- **Odoo 19.0** — framework, ORM y motor de reportes.
-- **Python 3.10+** — modelo `sale.order` y controlador HTTP.
-- **XML** — definición de la server action (`ir.actions.server`).
-- **QWeb** — plantilla estándar `sale.report_saleorder`.
-- **PostgreSQL** — base de datos de Odoo (el módulo no crea tablas ni campos).
-- **HTTP / Werkzeug** — ruta de descarga `/sale/order/download_pdf/<id>`.
+- **Odoo 19.0** — framework, ORM and report engine.
+- **Python 3.10+** — `sale.order` model and HTTP controller.
+- **XML** — server action definition (`ir.actions.server`).
+- **QWeb** — standard `sale.report_saleorder` template.
+- **PostgreSQL** — Odoo database (the module creates no tables or fields).
+- **HTTP / Werkzeug** — download route `/sale/order/download_pdf/<id>`.
 
-## Requisitos previos
+## Prerequisites
 
-- **Odoo 19.0** (probado en Community; no usa APIs exclusivas de Enterprise).
-- **Python 3.10 o superior**, según lo requiera tu instalación de Odoo 19.
-- **PostgreSQL** en la versión soportada por tu instalación de Odoo 19.
-- Módulo **`sale_management`** instalado.
-- Opcional: **`sale_credit_approval_gate`** para respetar el bloqueo por crédito.
-- Compatible con **`wk_odoo_direct_print`**; no es necesario para funcionar.
+- **Odoo 19.0** (tested on Community; no Enterprise-only APIs).
+- **Python 3.10 or higher**, as required by your Odoo 19 installation.
+- **PostgreSQL** in the version supported by your Odoo 19 installation.
+- **`sale_management`** module installed.
+- Optional: **`sale_credit_approval_gate`** to honor the credit block.
+- Compatible with **`wk_odoo_direct_print`**; it is not required to work.
 
-## Instalación
+## Installation
 
-1. Clona o copia el módulo en tu máquina:
+1. Clone or copy the module to your machine:
 
    ```bash
    git clone https://github.com/ssant0/sale_order_pdf_download.git sale_order_pdf_download
    ```
 
-2. Deja el directorio dentro de una ruta incluida en `addons_path`. Puedes enlazarlo:
+2. Keep the directory inside a path included in `addons_path`. You can link it:
 
    ```bash
-   ln -s /ruta/a/sale_order_pdf_download /ruta/a/odoo/addons/sale_order_pdf_download
+   ln -s /path/to/sale_order_pdf_download /path/to/odoo/addons/sale_order_pdf_download
    ```
 
-3. Confirma que el directorio padre esté en `addons_path` de tu `odoo.conf`:
+3. Confirm the parent directory is in your `odoo.conf` `addons_path`:
 
    ```ini
    [options]
-   addons_path = /ruta/a/odoo/addons,/ruta/a/addons
+   addons_path = /path/to/odoo/addons,/path/to/addons
    ```
 
-4. Instala el módulo:
+4. Install the module:
 
    ```bash
-   odoo -d <base_de_datos> -i sale_order_pdf_download --stop-after-init
+   odoo -d <database> -i sale_order_pdf_download --stop-after-init
    ```
 
-   Si tu instalación usa el binario con otro nombre, el equivalente es `odoo-bin`.
+   If your installation uses a different binary name, the equivalent is `odoo-bin`.
 
-5. Alternativa desde la interfaz: activa el **modo desarrollador**, ve a **Ajustes → Apps**, pulsa **Actualizar lista de aplicaciones** y busca **PDF en Órdenes de Venta**.
+5. UI alternative: enable **developer mode**, go to **Settings → Apps**, click **Update Apps List** and search for **PDF en Órdenes de Venta**.
 
 > [!WARNING]
-> En producción, respalda la base de datos y avisa al equipo antes de instalar o actualizar: el comando reinicia Odoo al terminar.
+> In production, back up the database and notify your team before installing or upgrading: the command restarts Odoo when it finishes.
 
-## Variables de entorno
+## Environment variables
 
-El módulo no define variables de entorno ni lee `os.environ`. Toda la configuración proviene de Odoo:
+The module defines no environment variables and does not read `os.environ`. All configuration comes from Odoo:
 
-| Variable / clave | Descripción | Entorno | Requerida |
+| Variable / key | Description | Environment | Required |
 |---|---|---|---|
-| `addons_path` (`odoo.conf`) | Debe incluir el directorio padre del módulo | Todos | Sí |
-| `db_name` (`odoo.conf` o `-d`) | Base de datos donde se instala el addon | Todos | Sí |
+| `addons_path` (`odoo.conf`) | Must include the module's parent directory | All | Yes |
+| `db_name` (`odoo.conf` or `-d`) | Database where the addon is installed | All | Yes |
 
-No hay archivo `.env.example` porque no se necesitan secretos ni configuración propia.
+There is no `.env.example` file because no secrets or custom configuration are needed.
 
-## Uso
+## Usage
 
-1. Abre **Ventas → Pedidos** y entra a una cotización **guardada**.
-2. Pulsa el menú del engranaje (**Acción**) y elige **Descargar PDF**.
-3. El navegador descarga el archivo:
-   - `Cotizacion_<folio>.pdf` si la orden está en estado `draft` o `sent`.
-   - `Pedido_<folio>.pdf` si ya está confirmada o en un estado posterior.
-4. El botón **Imprimir** sigue funcionando como siempre a través de PrintDirect; esta acción solo descarga.
+1. Open **Sales → Orders** and open a **saved** quotation.
+2. Click the cog menu (**Action**) and choose **Download PDF**.
+3. The browser downloads the file:
+   - `Cotizacion_<reference>.pdf` if the order is in `draft` or `sent` state.
+   - `Pedido_<reference>.pdf` if it is confirmed or in a later state.
+4. The **Print** button keeps working as usual through PrintDirect; this action only downloads.
 
 > [!IMPORTANT]
-> La descarga trabaja sobre **una sola orden guardada**. Una orden nueva sin `id`, o varias órdenes seleccionadas desde la vista de lista, muestran un error y no generan el archivo.
+> The download works on **a single saved order**. A new order without an `id`, or several orders selected from the list view, show an error and generate no file.
 
-Si `sale_credit_approval_gate` está instalado y la orden es a crédito sin aprobar, **Descargar PDF** muestra el error del gate y no descarga. Si el módulo no está instalado, el addon funciona de forma independiente.
+If `sale_credit_approval_gate` is installed and the order is a credit order that is not approved, **Download PDF** shows the gate error and does not download. If the module is not installed, the addon works independently.
 
-## Cómo funciona
+## How it works
 
 ```text
 data/ir_actions_server.xml
@@ -114,75 +116,76 @@ data/ir_actions_server.xml
   → act_url /sale/order/download_pdf/<id>
   → controllers/main.py
   → _render_qweb_pdf("sale.report_saleorder")
-  → respuesta con Content-Disposition: attachment
+  → response with Content-Disposition: attachment
 ```
 
-- La **server action** se engancha con `binding_model_id` + `binding_type = action`, por eso aparece en el engranaje.
-- El modelo valida que haya exactamente una orden, comprueba `check_access("read")` y aplica el gate de crédito si existe.
-- El **controlador** es accesible por URL directa, así que repite `check_access("read")` y `_check_pdf_download_allowed()`; no usa `sudo()`.
-- `_render_qweb_pdf()` devuelve la tupla `(pdf, report_type)`; el controlador desempaqueta ambos valores.
-- El nombre del archivo se sanea con una regex porque los folios de Odoo contienen `/`.
-- `sale_credit_approval_gate` es una dependencia blanda: se detecta con `"credit_gate_required" in self._fields` y el import de `raise_credit_blocked` es perezoso.
+- The **server action** is bound with `binding_model_id` + `binding_type = action`, which is why it appears in the cog menu.
+- The model checks that there is exactly one order, verifies `check_access("read")` and applies the credit gate when available.
+- The **controller** is reachable by direct URL, so it repeats `check_access("read")` and `_check_pdf_download_allowed()`; it does not use `sudo()`.
+- `_render_qweb_pdf()` returns the `(pdf, report_type)` tuple; the controller unpacks both values.
+- The file name is sanitized with a regex because Odoo references contain `/`.
+- `sale_credit_approval_gate` is a soft dependency: it is detected with `"credit_gate_required" in self._fields` and the `raise_credit_blocked` import is lazy.
 
 > [!WARNING]
-> En un server action de Odoo 19 la variable `model` llega como un recordset vacío. Los ids deben resolverse desde `active_ids` / `active_id` del contexto; usar `model` provoca `Expected singleton: sale.order()`.
+> In an Odoo 19 server action the `model` variable arrives as an empty recordset. Ids must be resolved from the context's `active_ids` / `active_id`; using `model` raises `Expected singleton: sale.order()`.
 
-## Comandos disponibles
+## Available commands
 
-El módulo no incluye `Makefile`, `package.json`, `justfile`, tests automatizados ni linter. La verificación es manual desde el formulario.
+The module ships no `Makefile`, `package.json`, `justfile`, automated tests or linter. Verification is manual from the form.
 
-| Comando | Para qué |
+| Command | Purpose |
 |---|---|
-| `odoo -d <db> -i sale_order_pdf_download --stop-after-init` | Instalar el módulo. |
-| `odoo -d <db> -u sale_order_pdf_download --stop-after-init` | Actualizar tras cambiar el código o los datos XML. |
-| `odoo -d <db>` | Arrancar el servidor para probar en la interfaz. |
-| `odoo -d <db> --dev=all` | Desarrollo con recarga y trazas detalladas. |
+| `odoo -d <db> -i sale_order_pdf_download --stop-after-init` | Install the module. |
+| `odoo -d <db> -u sale_order_pdf_download --stop-after-init` | Upgrade after changing code or XML data. |
+| `odoo -d <db>` | Start the server to test in the UI. |
+| `odoo -d <db> --dev=all` | Development with reload and detailed traces. |
 
-Checklist manual después de un cambio:
+Manual checklist after a change:
 
-1. La acción aparece en el engranaje del pedido.
-2. Descarga `Cotizacion_<folio>.pdf` sin enviar nada a la impresora.
-3. **Imprimir** sigue usando PrintDirect.
-4. Con el gate de crédito instalado: una orden a crédito sin aprobar no descarga; tras aprobarla, sí.
-5. Una orden inexistente devuelve 404 y un error de permisos devuelve 403.
+1. The action appears in the order's cog menu.
+2. It downloads `Cotizacion_<reference>.pdf` without sending anything to the printer.
+3. **Print** still uses PrintDirect.
+4. With the credit gate installed: an unapproved credit order does not download; after approval it does.
+5. A nonexistent order returns 404 and a permission error returns 403.
 
-## Solución de problemas
+## Troubleshooting
 
-| Síntoma | Causa / solución |
+| Symptom | Cause / fix |
 |---|---|
-| No aparece “Descargar PDF” | El módulo no está instalado, no se actualizó la lista de apps o el usuario no tiene acceso a Ventas. |
-| “Selecciona una sola orden…” | La orden es nueva sin guardar o hay varias seleccionadas en la lista. |
-| Descarga vacía o error 403 | Sin permisos sobre la orden, o a crédito sin aprobar. |
-| El archivo se llama `Pedido_...` | La orden ya está confirmada; es el nombre esperado. |
-| No descarga y abre una pestaña | El navegador bloqueó la descarga; revisa los permisos del sitio. |
-| Error `Expected singleton: sale.order()` | La server action está usando `model`; debe leer `active_ids` / `active_id`. |
+| "Download PDF" does not appear | The module is not installed, the apps list was not refreshed, or the user has no access to Sales. |
+| "Select a single order…" | The order is new and unsaved, or several are selected in the list. |
+| Empty download or 403 error | No permission on the order, or an unapproved credit order. |
+| The file is named `Pedido_...` | The order is already confirmed; this is the expected name. |
+| Nothing downloads and a tab opens | The browser blocked the download; check the site permissions. |
+| `Expected singleton: sale.order()` error | The server action is using `model`; it must read `active_ids` / `active_id`. |
 
-## Limitaciones
+## Limitations
 
-- Solo descarga **una orden a la vez**, desde el formulario, y debe estar guardada.
-- Usa el reporte estándar `sale.report_saleorder`; si se cambia la plantilla en el controlador, hay que actualizar también el nombre del reporte.
-- No modifica `wk_odoo_direct_print` ni `sale_credit_approval_gate`.
-- No define ACL propias: reutiliza las de `sale` y valida con `check_access("read")`.
+- It only downloads **one order at a time**, from the form, and the order must be saved.
+- It uses the standard `sale.report_saleorder` report; if the template is changed in the controller, the report name must be updated too.
+- It does not modify `wk_odoo_direct_print` or `sale_credit_approval_gate`.
+- It defines no ACLs of its own: it reuses those of `sale` and validates with `check_access("read")`.
 
-## Contribuir
+## Contributing
 
-- Crea una rama con prefijo `feat/`, `fix/` o `docs/` y mantén el cambio acotado a un solo propósito.
-- Usa mensajes de commit en formato **Conventional Commits** (`feat: ...`, `fix: ...`, `docs: ...`).
-- Al cambiar comportamiento, sube la versión del manifiesto en formato `19.0.x.y.z` y agrega la entrada correspondiente en [Historial de versiones](#historial-de-versiones).
-- Mantén los textos de UI, comentarios y documentación en **español**.
-- Conserva las dos capas de validación (modelo y controlador) y el patrón de dependencia opcional con import perezoso.
-- Antes de abrir el PR, ejecuta el checklist manual y describe en la descripción qué probaste.
+- Create a branch prefixed with `feat/`, `fix/` or `docs/` and keep the change scoped to a single purpose.
+- Use **Conventional Commits** messages (`feat: ...`, `fix: ...`, `docs: ...`).
+- When changing behavior, bump the manifest version in `19.0.x.y.z` format and add the matching entry to [Version history](#version-history).
+- Keep **UI texts, code comments and the manifest description in Spanish**. Documentation is bilingual: `README.md` in English and `README.es.md` in Spanish; update both when behavior changes.
+- Preserve the two validation layers (model and controller) and the soft-dependency pattern with a lazy import.
+- Before opening the PR, run the manual checklist and describe what you tested in the description.
 
-## Licencia
+## License
 
-Este proyecto es **código abierto y gratuito** para todos. Se distribuye bajo la **GNU Lesser General Public License v3.0 (LGPL-3.0)**.
+This project is **open source and free** for everyone. It is distributed under the **GNU Lesser General Public License v3.0 (LGPL-3.0)**.
 
-El texto completo de la licencia está en [`LICENSE`](LICENSE); también puedes consultar el campo `license` de [`__manifest__.py`](__manifest__.py).
+The full license text is in [`LICENSE`](LICENSE); you can also check the `license` field of [`__manifest__.py`](__manifest__.py).
 
-## Historial de versiones
+## Version history
 
-- `19.0.1.0.0` — versión inicial.
-- `19.0.1.0.1` — error claro cuando no hay exactamente una orden.
-- `19.0.1.0.2` — obtiene los ids desde `active_ids` / `active_id`; `model` siempre viene vacío en Odoo 19.
-- `19.0.1.0.3` — dependencia opcional de `sale_credit_approval_gate` y check de acceso en el controlador.
-- `19.0.1.0.4` — nombre visible en Apps: **PDF en Órdenes de Venta**.
+- `19.0.1.0.0` — initial version.
+- `19.0.1.0.1` — clear error when there is not exactly one order.
+- `19.0.1.0.2` — gets ids from `active_ids` / `active_id`; `model` is always empty in Odoo 19.
+- `19.0.1.0.3` — optional `sale_credit_approval_gate` dependency and access check in the controller.
+- `19.0.1.0.4` — visible name in Apps: **PDF en Órdenes de Venta**.
+- `19.0.1.0.5` — bilingual documentation: `README.md` in English and `README.es.md` in Spanish.
