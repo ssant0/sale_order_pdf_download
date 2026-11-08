@@ -1,6 +1,6 @@
 {
     "name": "PDF en Órdenes de Venta",
-    "version": "19.0.1.0.4",
+    "version": "19.0.1.0.5",
     "summary": "Descarga el PDF de la orden sin pasar por la impresión directa.",
     "description": """
 PDF en Órdenes de Venta

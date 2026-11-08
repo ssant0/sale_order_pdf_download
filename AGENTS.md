@@ -70,6 +70,8 @@ pedido de venta. Guía de usuario: `README.md`.
   `19.0.x.y.z`.
 - Al cambiar comportamiento, sube la versión y agrega una entrada al historial
   de `README.md` (se viene haciendo desde `19.0.1.0.0`).
-- Textos de UI, README y comentarios en español.
+- Textos de UI, comentarios y descripción del manifiesto en español.
+- Documentación bilingüe: `README.md` en inglés (principal) y `README.es.md` en
+  español. Ambos se enlazan entre sí y deben actualizarse juntos.
 - No hay ACL propias: se reutilizan las de `sale` y el acceso se valida con
   `check_access("read")`.
