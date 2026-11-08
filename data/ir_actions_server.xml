@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_download_sale_order_pdf" model="ir.actions.server">
+        <field name="name">Descargar PDF</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">action</field>
+        <field name="state">code</field>
+        <!--
+            En Odoo 19 la variable `model` del contexto de evaluación es
+            SIEMPRE `env['sale.order']` vacío. Los registros seleccionados
+            llegan en `active_id` / `active_ids` del contexto, así que hay que
+            resolverlos aquí.
+        -->
+        <field name="code">
+ids = env.context.get('active_ids') or []
+if not ids and env.context.get('active_id'):
+    ids = [env.context['active_id']]
+action = env['sale.order'].browse(ids).action_download_pdf()
+        </field>
+    </record>
+</odoo>

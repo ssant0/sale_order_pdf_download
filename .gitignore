@@ -1,0 +1,70 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+eggs/
+
+# --- Entornos virtuales ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Odoo ---
+# Configuración local y credenciales
+odoo.conf
+*.local.conf
+.odoorc
+.env
+.env.*
+!.env.example
+
+# Logs y archivos de ejecución
+*.log
+*.pid
+
+# Datos locales y respaldos de base de datos
+filestore/
+/*.sql
+*.dump
+*.sql.gz
+*.backup
+
+# Traducciones compiladas (se generan desde los .po)
+*.mo
+
+# --- Pruebas y cobertura ---
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+
+# --- Editores e IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Sistema operativo ---
+.DS_Store
+._*
+.AppleDouble
+Thumbs.db
+Desktop.ini
+
+# --- Herramientas locales del agente ---
+# No forman parte del addon; se instalan por proyecto.
+.agents/
+skills-lock.json
